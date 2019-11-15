@@ -1,0 +1,134 @@
+<meta charset="utf-8" />
+<style>
+    #c {
+        border: 1px solid gray;
+    }
+    #label {
+        border: 1px solid lightgray;
+        position: absolute;
+        padding-left: 10px;
+        padding-right: 10px;
+        display: none;
+    }
+</style>
+Java: <input name="courses" value="100" item="Java" /><br />
+C: <input name="courses" value="200" item="C" /><br />
+MySQL: <input name="courses" value="50" item="MySQL" /><br />
+PHP: <input name="courses" value="90" item="PHP" /><br />
+Oracle: <input name="courses" value="120" item="Oracle" /><br />
+<button onclick="genChart()">Gen</button>
+<hr />
+<canvas id="c" width="300" height="300"></canvas>
+<div id="label"></div>
+<script>
+    let c, ctx;
+    let width, height;
+    let x, y, r = 120;
+
+    let colors = new Array(5);
+
+    let center_positions = new Array();
+
+    let font_height = 15;
+
+    let gen = false;
+
+    window.onload = function() {
+        c = document.querySelector("#c");
+        ctx = c.getContext("2d");
+        width = c.width;
+        height = c.height;
+        x = width / 2;
+        y = height / 2;
+
+        ctx.font = `bold italic ${font_height}px Times New Roman`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+
+        for (let i = 0, len = colors.length; i < len; i++)
+            colors[i] = ("rgba(" + parseInt(Math.random() * 256) + ", " + parseInt(Math.random() * 256) + ", " + parseInt(Math.random() * 256) + ", " + Math.random() + ")");
+
+        // console.log(colors);
+
+        c.onmousemove = function() {
+            // 只要鼠标移动，就必须循环所有中心点位置，实时检查靠近哪一个文字区域
+            if (gen) {
+                let pos = getPosition();
+                if (pos != -1) {
+                    document.querySelector("#label").style.display = "block";
+                    document.querySelector("#label").textContent = document.querySelector(`input:nth-of-type(${pos + 1})`).value;
+                    document.querySelector("#label").style.left = event.pageX + 5;
+                    document.querySelector("#label").style.top = event.pageY + 5;
+                } else {
+                    document.querySelector("#label").style.display = "none";
+                }
+            }
+        }
+    }
+
+    function getPosition() {
+        // console.log(event.offsetX, event.offsetY);
+        let pos = -1;
+        for (let i = 0, len = center_positions.length; i < len; i++) {
+            if (
+                event.offsetX > center_positions[i].center_x - center_positions[i].width / 2 &&
+                event.offsetX < center_positions[i].center_x + center_positions[i].width / 2 &&
+                event.offsetY > center_positions[i].center_y - center_positions[i].height / 2 &&
+                event.offsetY < center_positions[i].center_y + center_positions[i].height / 2
+            ) {
+                pos = i;
+                break;
+            }
+        }
+        return pos;
+    }
+
+    // 根据索引计算该项所占百分比
+    function getPercent(i) {
+        let item = document.querySelector(`input:nth-of-type(${i + 1})`);
+        let items = document.querySelectorAll("input");
+        let sum = 0;
+        items.forEach(function({ value }) {
+            sum += +value;
+        });
+        return item.value / sum;
+    }
+    
+    function genChart() {
+        gen = true;
+
+        ctx.clearRect(0, 0, width, height);
+
+        let items = document.querySelectorAll("input");
+        let start = Math.PI * 3 / 2;
+        let end = null;
+        items.forEach(function(course, index) {
+            end = start + getPercent(index) * Math.PI * 2;
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.arc(x, y, r, start, end);
+            ctx.fillStyle = colors[index];
+            ctx.fill();
+
+            // 求每个扇形的中心点
+            let angle = (start + end) / 2;
+            let center_x = x + r * 3 / 5 * Math.cos(angle);
+            let center_y = y + r * 3 / 5 * Math.sin(angle);
+            ctx.fillStyle = "pink";
+            ctx.fillText(course.getAttribute("item"), center_x, center_y);
+
+            // 保存每个文字中心点位置，高度，宽度
+            center_positions.push({
+                center_x,
+                center_y,
+                width: ctx.measureText(course.getAttribute("item")).width,
+                height: font_height
+            });
+
+            ctx.closePath();
+            start = end;
+        });
+
+        // console.log(center_positions);
+    }
+</script>
