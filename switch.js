@@ -1,5 +1,5 @@
 (function(context){
-    context.switch {
+    context.switcher  = {
         init(target) {
             let c1 = document.querySelector(target);
             let ctx = c1.getContext("2d");
