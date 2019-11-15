@@ -5,37 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
-    <script src="./echarts.js"></script>
+    <script src="./switch.js"></script>
+    <style>
+        canvas {
+            border:1px solid red;
+            border-radius: 26px;
+        }
+    </style>
     <script>
         window.onload = function(){
-            var myChart = echarts.init(document.querySelector("#div1"));
-            var option = {
-                title: {
-                    text: '11月销量排行榜'
-                },
-                tooltip: {
-
-                },
-                legend: {
-                    data: ['销量']
-                },
-                xAxis: {
-                    data:["衬衫","羊毛衫","雪纺衫","裤子","高跟鞋","袜子"]
-                },
-                yAxis: {
-                    
-                },
-                series: [{
-                    name: '销量' ,
-                    type: 'bar',
-                    data: [5, 20, 36, 10, 10, 20]
-                }]
-            }
-            myChart.setOption(option);
-        }
+          
+        
+}
     </script>
 </head>
 <body>
-    <div id="div1" width="atuo" height="500"></div>
+    <canvas id="c1" width="40" height="20" on="#0654ba" off="lightgray" circle="white" status="off"></canvas>
 </body>
 </html>
